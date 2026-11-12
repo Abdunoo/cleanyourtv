@@ -313,6 +313,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private List<Cards.Card> cards = Collections.emptyList();
     /** The grid has been laid out and focused since the last resume; the card prompt waits for this. */
     private boolean tilesReady;
+    private View topButtonLeftFrom;
     private boolean settingsRecreationPending;
     private Dialog cardPrompt;
     /** Set when a decision could not be saved: no more prompts until the next resume, instead of asking in a loop. */
@@ -1105,6 +1106,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         restartIdleClock();
         promptsPaused = false;
         if (grid.getAdapter() == null) grid.setAdapter(adapter);   // dropped by onTrimMemory
+        final View topButton = tileRefresh.keepsTopButton(topButtonLeftFrom != null) ? topButtonLeftFrom : null;
+        topButtonLeftFrom = null;
         switch (tileRefresh.onResume(packagesChangedSinceRebuild())) {
             case REBUILD:
                 tilesReady = false;
@@ -1112,6 +1115,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 break;
             case REFOCUS:
                 // The same tiles: only the focus goes back, as after a rebuild, without replaying the entrance.
+                if (topButton != null && topButton.getVisibility() == View.VISIBLE) {
+                    topButton.requestFocus();
+                    break;
+                }
                 tilesReady = false;
                 reloadApps(true, false, false);
                 break;
@@ -1339,6 +1346,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         clockRefresh.stop();
         handler.removeCallbacks(clockCheck);
         stopped = true;
+        View focused = getCurrentFocus();
+        topButtonLeftFrom = focused != null && focused.getParent() == findViewById(R.id.topButtons) ? focused : null;
         tileRefresh.onStop();
     }
 

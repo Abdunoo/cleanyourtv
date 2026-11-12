@@ -90,4 +90,45 @@ public class TileRefreshTest {
         r.onResume(false);
         return r;
     }
+
+    @Test
+    public void backFromAnAppKeepsTheTopButtonThatOpenedIt() {
+        TileRefresh refresh = new TileRefresh();
+        refresh.onStart();
+        refresh.onResume(false);
+        refresh.onStop();
+        assertTrue(refresh.keepsTopButton(true));
+    }
+
+    @Test
+    public void backFromAnAppOpenedFromATileGoesBackToTheTiles() {
+        TileRefresh refresh = new TileRefresh();
+        refresh.onStart();
+        refresh.onResume(false);
+        refresh.onStop();
+        assertFalse(refresh.keepsTopButton(false));
+    }
+
+    @Test
+    public void homePressedInAnAppLeavesTheTopButtonForTheFirstTile() {
+        TileRefresh refresh = new TileRefresh();
+        refresh.onStart();
+        refresh.onResume(false);
+        refresh.onStop();
+        refresh.onHomeAgain();
+        assertFalse(refresh.keepsTopButton(true));
+    }
+
+    @Test
+    public void homePressIsForgottenOnceHomeHasResumed() {
+        TileRefresh refresh = new TileRefresh();
+        refresh.onStart();
+        refresh.onResume(false);
+        refresh.onStop();
+        refresh.onHomeAgain();
+        refresh.onStart();
+        refresh.onResume(false);
+        refresh.onStop();
+        assertTrue(refresh.keepsTopButton(true));
+    }
 }

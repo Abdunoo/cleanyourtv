@@ -14,6 +14,7 @@ final class TileRefresh {
     /** The tiles may not match the installed apps: true until the first build. */
     private boolean stale = true;
     private boolean refocus;
+    private boolean homeAgain;
 
     void onStart() {
         started = true;
@@ -23,11 +24,17 @@ final class TileRefresh {
     void onStop() {
         started = false;
         refocus = true;
+        homeAgain = false;
     }
 
     /** Home pressed while Home is in front: back to the first tile. */
     void onHomeAgain() {
         refocus = true;
+        homeAgain = true;
+    }
+
+    boolean keepsTopButton(boolean topButtonHadFocus) {
+        return topButtonHadFocus && !homeAgain;
     }
 
     /** The tiles were dropped (onTrimMemory): build them again on the way back. */
